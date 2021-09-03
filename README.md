@@ -12,16 +12,16 @@ Add the script to the any webpage.
 
 Add the script tag element to your page and set attribute values for confection settings.
 
-The first 4 digits are for your account id value. Found on your confection dashboard.
-After the - the last 3 digits configure your confection settings.
+The first 4 digits are for your account id value, found on your confection dashboard.
+The last 3 digits are configuration values.
 
 - The first position is the privacy type setting.
 
-- The second tells the confection component where to render left center or right.
+- The second tells the confection component where to render, left center or right.
 
 - The third position enables or disables analytics.
 
-For instance if your account id is 7204 and you want options to be privacy type GDPR and your banner to be centered and analytics enabled. Your script id we look like this.
+For instance if your account id is 7204 and you want options to be privacy type GDPR and your banner to be centered and analytics enabled. Your script id would look like this.
 
 ```
 id="7204-111"
