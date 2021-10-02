@@ -56,4 +56,28 @@ Confection allows users to collect, store, and distribute data in accordance wit
 	- true = 1
 
 
+## Events
 
+Add event listners to page to get the global values.
+
+    <script>
+        window.addEventListener("ConfectionUuidGenerated", function(e){
+            console.log(e.detail.uuid)
+        });
+    
+        window.addEventListener("ConfectionAccountId", function(e){
+            console.log(e.detail.account)
+        });
+    
+        window.addEventListener("ConfectionPrivacy", function(e){
+            console.log(e.detail.privacy)
+        });
+    
+        window.addEventListener("ConfectionAnalytics", function(e){
+            console.log(e.detail.analytics)
+        });
+    
+        window.addEventListener("ConfectionPosition", function(e){
+            console.log(e.detail.position)
+        });
+    </script>
