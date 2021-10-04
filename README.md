@@ -39,13 +39,6 @@ Valid values for confection settings are as follows:
 
 * Your account ID can be found found in your Confection account dashboard.
 
-- Confection uses a compact, minimally-invasive banner to get user consent. Unlike other consent banners, ours only appears when necessary. Position attribute values are:
-
-    - left = 0
-    - center = 1
-    - right = 2
-
-
 - Until Confection gets consent from a user, it will only collect non-personally-identifying information.
 Confection allows users to collect, store, and distribute data in accordance with the data protection law of their choice. Privacy attribute values are: 
     - none = 0 
@@ -53,11 +46,15 @@ Confection allows users to collect, store, and distribute data in accordance wit
     - ccpa = 2
     - lgpd = 3
 
+- Confection uses a compact, minimally-invasive banner to get user consent. Unlike other consent banners, ours only appears when necessary. Position attribute values are:
+
+    - left = 0
+    - center = 1
+    - right = 2
 
 - Analytics
 	- false = 0
 	- true = 1
-
 
 ## Events
 
