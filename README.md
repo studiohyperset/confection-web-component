@@ -6,8 +6,6 @@ This script helps Confection customers add Confection to their sites.
 
 Need help getting started? See [confection.io/quick-start/wss](https://confection.io/quick-start/wss) Need an account? Set one up @ [https://dashboard.confection.io/register](dashboard.confection.io/register) (It's free.)
 
-Confection collects, stores, and distributes data in a way that's unaffected by client-side disruptions involving cookies, cross-domain scripts, and device IDs. It's also compliant with global privacy laws so it’s good for people too.
-
 ## Usage
 Add the script to the any webpage.
 
