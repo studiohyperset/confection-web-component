@@ -4,7 +4,7 @@ Confection collects, stores, and distributes data in a way that's unaffected by 
 
 This script helps Confection customers add Confection to their sites.
 
-Need help getting started? See [confection.io/quick-start/wss](https://confection.io/quick-start/wss) Need an account? Set one up @ [https://dashboard.confection.io/register](dashboard.confection.io/register) (It's free.)
+Need help getting started? See [confection.io/quick-start/wss](https://confection.io/quick-start/wss) Need an account? Set one up @ [dashboard.confection.io/register](https://dashboard.confection.io/register) (It's free.)
 
 ## Usage
 Add the script to the any webpage.
