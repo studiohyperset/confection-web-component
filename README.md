@@ -24,10 +24,10 @@ The last 3 digits are configuration values.
 
 - The third position enables or disables analytics.
 
-For instance if your account id is 7204 and you want options to be privacy type GDPR and your banner to be centered and analytics enabled. Your script id would look like this.
+For instance if your account id is 1234 and you want options to be privacy type GDPR and your banner to be centered and analytics enabled. Your script id would look like this.
 
 ```
-id="7204-111"
+id="1234-111"
 ```
 
 Option values are found below.
