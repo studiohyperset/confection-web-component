@@ -2,6 +2,7 @@
 
 Creates custom html element to configure and load Confection Banner.
 
+Need help getting started? See [confection.io/quick-start/wss](https://confection.io/quick-start/wss) Need an account? Set one up @ [https://dashboard.confection.io/register](dashboard.confection.io/register) (It's free.)
 
 ## Usage
 Add the script to the any webpage.
