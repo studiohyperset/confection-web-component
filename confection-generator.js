@@ -365,6 +365,7 @@ class Confection {
 
         var badgeToggler = document.createElement("DIV");
         badgeToggler.style.cssText = 'margin: 0 5px; border-radius: 100%; width: 50px; flex: 0 0 50px; padding: 0; height: 50px; background: #000; box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.3);position: relative;';
+        badgeToggler.innerHTML = this.logoSvg('#fff');
 
         if (confection.privacy != 'none')
             badgeToggler.style.cssText += 'cursor: pointer;';
