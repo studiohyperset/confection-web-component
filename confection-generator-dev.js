@@ -1087,7 +1087,7 @@ for (let script of document.getElementsByTagName("SCRIPT")) {
         let configData = script.id;
         configData = configData.split("-");
 
-        if (configData[0].length == 3) {
+        if (configData[1].length == 3) {
 
             let privacyOptions = [
                 "none",
