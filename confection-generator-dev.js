@@ -2,6 +2,7 @@ class Confection {
 
     constructor() {
 
+        this.version = '1.0.2';
         this.uuid = false;
         this.domain = window.location.hostname;
         this.privacy = 'none'; //Privacy setup. none|default|strict
@@ -19,9 +20,9 @@ class Confection {
         this.consentLost = false;
         this.ignoreFields = [];  //Holds field name which will be ignored
         this.analytics = true;
-
-        this.wss = new WebSocket("wss://wss.confection.io");
-        this.wssTimeout = false;
+        this.appendCss = '';
+        this.randomId = 'banner' + this.hexSingleConvert( this.random_number(10000, 99999) );
+        this.badgeStyle = document.createElement("style");
 
         /*
          * Translation Strings
@@ -352,6 +353,19 @@ class Confection {
 
 
     /*
+     * createStylesheet
+    */
+    addStyle( style, space ) {
+
+        if (space === undefined)
+            space = ' ';
+
+        this.badgeStyle.appendChild(document.createTextNode('#'+ this.randomId + space + style));
+
+    }
+
+
+    /*
      * Display the privacy banner
      */
     showPrivacyBanner() {
@@ -362,22 +376,31 @@ class Confection {
         
         this.showedBanner = 1;
 
+        this.addStyle('{max-width: 100%; padding: 10px; color: #111; font-size: 14px; position: fixed; bottom: 20px; right: 0;font-family: Arial; text-align: center; transition: width: 0.3s; display: flex; align-items: start; z-index: 2147483640;}');
+        this.addStyle('.left{right: initial; left: 0;}', '');
+        this.addStyle('.center{right: initial; left: 50%; transform: translateX(-50%);}', '');
+        this.addStyle('.toggler{margin: 0 5px; border-radius: 100%; width: 50px; flex: 0 0 50px; padding: 0; height: 50px; background: #000; box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.3);position: relative;cursor:pointer;}');
+        this.addStyle('.toggler.none{cursor:none;}');
+        this.addStyle('.privacy-link{font-weight: 400; text-decoration: underline; color: #444; display: block; height:36px;line-height:36px;}');
+        this.addStyle('.btnok{font-weight: 400;padding-top: 5px;background: #03a9f4;display: inline-block;height: 36px;width: 100%;color: #fff;text-decoration: none;line-height: 36px;padding: 0;margin: 0 0 6px; transition: all 0.25s;}');
+        this.addStyle('.btnok:hover{background:#2196f3}');
+        this.addStyle('.btnok.no{background: rgba(0,0,0,0.2);color: #eee;}');
+        this.addStyle('.btnok.no:hover{background: rgba(0,0,0,0.4);}');
+        this.addStyle('.openbanner{width: 400px; max-width: 100%; font-weight: 400; background: #0d80fb; color: #fff; padding: 10px; font-size: 12px;}');
+        this.addStyle('.openbanner.deny{background: #666; color: #fff;}');
+        this.addStyle('.openbanner > span{text-align: left; display: block;margin:0 0 8px;}');
+        this.addStyle('.openbanner > span > a{color: #fff; text-decoration: underline;}');
+
         var badge = document.createElement("DIV");  
-        badge.style.cssText = 'max-width: 100%; padding: 10px; color: #111; font-size: 14px; position: fixed; bottom: 20px; right: 0;font-family: Arial; text-align: center; transition: width: 0.3s; display: flex; align-items: start; z-index: 2147483640;';
-        if (this.bannerPosition == 'left')
-            badge.style.cssText += 'right: initial; left: 0;';
-        else if (this.bannerPosition == 'center')
-            badge.style.cssText += 'right: initial; left: 50%; transform: translateX(-50%);';
+        badge.id = this.randomId;
+        badge.classList.add(this.bannerPosition);
 
         var badgeToggler = document.createElement("DIV");
-        badgeToggler.style.cssText = 'margin: 0 5px; border-radius: 100%; width: 50px; flex: 0 0 50px; padding: 0; height: 50px; background: #000; box-shadow: 1px 1px 3px 0 rgba(0,0,0,0.3);position: relative;';
-            badgeToggler.innerHTML = this.logoSvg('#fff');
-
-        if (confection.privacy != 'none')
-            badgeToggler.style.cssText += 'cursor: pointer;';
+        badgeToggler.classList.add('toggler', confection.privacy);
+        badgeToggler.innerHTML = this.logoSvg('#fff');
         
         var privacyLink = document.createElement("a");
-        privacyLink.style.cssText = 'font-weight: 400; text-decoration: underline; color: #444; display: block; padding-top: 5px;';
+        privacyLink.classList.add('privacy-link');
         privacyLink.innerHTML = confection.i18n.button_more;
         privacyLink.target = '_blank';
         privacyLink.href = 'https://confection.io/people?utm_source=Confection-Banner&utm_medium=' + confection.domain;
@@ -424,11 +447,11 @@ class Confection {
                 badge.removeChild(banner);
             }
             banner = document.createElement("DIV");
-            banner.style.cssText = 'width: 400px; max-width: 100%; font-weight: 400; background: #0d80fb; color: #fff; padding: 10px; font-size: 12px;' ;
+            banner.classList.add('openbanner');
 
-            banner.innerHTML = '<span style="text-align: left; display: block;">'+ confection.i18n.banner_base +'</span><br />';
+            banner.innerHTML = '<span>'+ confection.i18n.banner_base +'</span><br />';
             if (confection.privacy == 'strict')
-                banner.innerHTML += '<span style="text-align: left; display: block;">'+ confection.i18n.banner_strict_base +'</span><br />';
+                banner.innerHTML += '<span>'+ confection.i18n.banner_strict_base +'</span><br />';
             
             if (confection.bannerPosition == 'left')
                 badge.insertBefore(banner, badgeToggler);
@@ -436,15 +459,9 @@ class Confection {
                 badge.appendChild(banner);
             
             var buttonAccept = document.createElement("a");
-            buttonAccept.style.cssText = 'font-weight: 400;padding-top: 5px;background: #03a9f4;display: inline-block;height: 30px;width: 100px;color: #fff;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonAccept.classList.add('btnok');
             buttonAccept.innerHTML = confection.i18n.button_accept;
             buttonAccept.href = '#';
-            buttonAccept.onmouseover = function(){
-                this.style.background = '#2196f3';
-            }
-            buttonAccept.onmouseleave = function(){
-                this.style.background = '#03a9f4';
-            }
             banner.appendChild(buttonAccept);
 
             buttonAccept.onclick = function(e){
@@ -457,15 +474,9 @@ class Confection {
             }
             
             var buttonDeny = document.createElement("a");
-            buttonDeny.style.cssText = 'font-weight: 400;padding-top: 5px;background: transparent;display: inline-block;height: 30px;width: 70px;color: #eee;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonDeny.classList.add('btnok', 'no');
             buttonDeny.innerHTML = confection.i18n.button_deny;
             buttonDeny.href = '#';
-            buttonDeny.onmouseover = function(){
-                this.style['text-decoration'] = 'underline';
-            }
-            buttonDeny.onmouseleave = function(){
-                this.style['text-decoration'] = 'none';
-            }
             banner.appendChild(buttonDeny);
 
             buttonDeny.onclick = function(e){
@@ -531,8 +542,8 @@ class Confection {
                 badge.removeChild(banner);
             }
             banner = document.createElement("DIV");
-            banner.style.cssText = 'width: 400px; max-width: 100%; font-weight: 400; background: #0d80fb; color: #fff; padding: 10px; font-size: 12px;' ;
-            banner.innerHTML = '<span style="text-align: left; display: block;">'+ confection.i18n.banner_strict +'</span><br />';
+            banner.classList.add('openbanner');
+            banner.innerHTML = '<span>'+ confection.i18n.banner_strict +'</span><br />';
 
             if (confection.bannerPosition == 'left')
                 badge.insertBefore(banner, badgeToggler);
@@ -540,15 +551,9 @@ class Confection {
                 badge.appendChild(banner);
             
             var buttonAccept = document.createElement("a");
-            buttonAccept.style.cssText = 'font-weight: 400;padding-top: 5px;background: #03a9f4;display: inline-block;height: 30px;width: 100px;color: #fff;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonAccept.classList.add('btnok');
             buttonAccept.innerHTML = confection.i18n.button_accept;
             buttonAccept.href = '#';
-            buttonAccept.onmouseover = function(){
-                this.style.background = '#2196f3';
-            }
-            buttonAccept.onmouseleave = function(){
-                this.style.background = '#03a9f4';
-            }
             banner.appendChild(buttonAccept);
 
             buttonAccept.onclick = function(e){
@@ -559,15 +564,9 @@ class Confection {
             }
             
             var buttonDeny = document.createElement("a");
-            buttonDeny.style.cssText = 'font-weight: 400;padding-top: 5px;background: transparent;display: inline-block;height: 30px;width: 70px;color: #eee;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonDeny.classList.add('btnok', 'no');
             buttonDeny.innerHTML = confection.i18n.button_deny;
             buttonDeny.href = '#';
-            buttonDeny.onmouseover = function(){
-                this.style['text-decoration'] = 'underline';
-            }
-            buttonDeny.onmouseleave = function(){
-                this.style['text-decoration'] = 'none';
-            }
             banner.appendChild(buttonDeny);
 
             buttonDeny.onclick = function(e){
@@ -612,9 +611,9 @@ class Confection {
                 badge.removeChild(banner);
             }
             banner = document.createElement("DIV");
-            banner.style.cssText = 'width: 400px; max-width: 100%; font-weight: 400; background: #666; color: #fff; padding: 10px; font-size: 12px;' ;
+            banner.classList.add('openbanner', 'deny');
             
-            banner.innerHTML = '<span style="text-align: left; display: block;">'+ confection.i18n.banner_collecting +'</span>';
+            banner.innerHTML = '<span>'+ confection.i18n.banner_collecting +'</span>';
 
             if (confection.bannerPosition == 'left')
                 badge.insertBefore(banner, badgeToggler);
@@ -622,15 +621,9 @@ class Confection {
                 badge.appendChild(banner);
             
             var buttonAccept = document.createElement("a");
-            buttonAccept.style.cssText = 'font-weight: 400;padding-top: 5px;background: #03a9f4;display: inline-block;height: 30px;width: 70px;color: #fff;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonAccept.classList.add('btnok');
             buttonAccept.innerHTML = confection.i18n.button_accept;
             buttonAccept.href = '#';
-            buttonAccept.onmouseover = function(){
-                this.style.background = '#2196f3';
-            }
-            buttonAccept.onmouseleave = function(){
-                this.style.background = '#03a9f4';
-            }
             banner.appendChild(buttonAccept);
 
             buttonAccept.onclick = function(e){
@@ -645,15 +638,9 @@ class Confection {
             }
             
             var buttonDeny = document.createElement("a");
-            buttonDeny.style.cssText = 'font-weight: 400;padding-top: 5px;background: transparent;display: inline-block;height: 30px;width: 100px;color: #eee;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonDeny.classList.add('btnok', 'no');
             buttonDeny.innerHTML = confection.i18n.button_stop;
             buttonDeny.href = '#';
-            buttonDeny.onmouseover = function(){
-                this.style['text-decoration'] = 'underline';
-            }
-            buttonDeny.onmouseleave = function(){
-                this.style['text-decoration'] = 'none';
-            }
             banner.appendChild(buttonDeny);
 
             buttonDeny.onclick = function(e){
@@ -688,8 +675,8 @@ class Confection {
             }
 
             banner = document.createElement("DIV");
-            banner.style.cssText = 'width: 400px; max-width: 100%; font-weight: 400; background: #0d80fb; color: #fff; padding: 10px; font-size: 12px;' ;
-            banner.innerHTML = '<span style="text-align: left; display: block;">'+ confection.i18n.banner_none + '<a href="https://confection.io/people?utm_source=Confection-Banner&utm_medium=' + confection.domain +'" target="_blank" style="color: #fff; text-decoration: underline;">'+ confection.i18n.button_click +'</a></span><br />';
+            banner.classList.add('openbanner');
+            banner.innerHTML = '<span>'+ confection.i18n.banner_none + '<a href="https://confection.io/people?utm_source=Confection-Banner&utm_medium=' + confection.domain +'" target="_blank">'+ confection.i18n.button_click +'</a></span><br />';
             
             if (confection.bannerPosition == 'left')
                 badge.insertBefore(banner, badgeToggler);
@@ -697,15 +684,9 @@ class Confection {
                 badge.appendChild(banner);
             
             var buttonAccept = document.createElement("a");
-            buttonAccept.style.cssText = 'font-weight: 400;padding-top: 5px;background: #03a9f4;display: inline-block;height: 30px;width: 150px;color: #fff;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonAccept.classList.add('btnok');
             buttonAccept.innerHTML = confection.i18n.button_resume;
             buttonAccept.href = '#';
-            buttonAccept.onmouseover = function(){
-                this.style.background = '#2196f3';
-            }
-            buttonAccept.onmouseleave = function(){
-                this.style.background = '#03a9f4';
-            }
             banner.appendChild(buttonAccept);
 
             buttonAccept.onclick = function(e){
@@ -723,15 +704,9 @@ class Confection {
             }
             
             var buttonDeny = document.createElement("a");
-            buttonDeny.style.cssText = 'font-weight: 400;padding-top: 5px;background: transparent;display: inline-block;height: 30px;width: 70px;color: #eee;text-decoration: none;line-height: 30px;padding: 0;margin: 5px; transition: all 0.25s;';
+            buttonDeny.classList.add('btnok', 'no');
             buttonDeny.innerHTML = confection.i18n.button_close;
             buttonDeny.href = '#';
-            buttonDeny.onmouseover = function(){
-                this.style['text-decoration'] = 'underline';
-            }
-            buttonDeny.onmouseleave = function(){
-                this.style['text-decoration'] = 'none';
-            }
             banner.appendChild(buttonDeny);
 
             buttonDeny.onclick = function(e){
@@ -751,6 +726,9 @@ class Confection {
         
         
         document.body.appendChild(badge); 
+
+        document.body.appendChild(this.badgeStyle); 
+
 
     }
 
@@ -913,21 +891,28 @@ class Confection {
 
         this.log('Submitting '+ type +': ' + name + '=' + value);
 
-        if(this.wss.readyState === this.wss.OPEN) {
-            this.log('Sent!');
-            this.wss.send(paramaters);
-        } else {
-            this.log('WSS not ready. Saving for later');
-            this.log(name, value,  type);
-            this.saveForLater(name, value, type);
-            if (this.wssTimeout === false) {
-                this.log('Scheduling late sending in 3 seconds');
-                this.wssTimeout = setTimeout(() => {
-                    this.lateSubmit();
-                }, 3000);
+        var request = new XMLHttpRequest();
+        request.open('GET', confection_url + paramaters, true);
+
+        request.onload = function () {
+            if (this.status >= 200 && this.status < 400) {
+                confection.log('Success.');
+                callback(true);
+                return true;
+            } else {
+                confection.log('Error. Wrong response from confection servers.');
+                callback(false);
+                return false;
             }
-        }
-        
+        };
+
+        request.onerror = function () {
+            confection.log('Error. Could not reach confection servers.');
+            callback(false);
+            return false;
+        };
+
+        request.send();
     }
 
     //Helper for event
@@ -942,9 +927,6 @@ class Confection {
      * we can submit it.
      */
     saveForLater(name, value, type) {
-
-        if (type == 'event') type = 'events';
-        if (type == 'field') type = 'fields';
 
         this.later[type][name] = value;
         confection.log('User didn’t consented. Saving value in memory.');
