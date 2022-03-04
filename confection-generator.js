@@ -2,7 +2,7 @@ class Confection {
 
     constructor() {
 
-        this.version = '1.0.2';
+        this.version = '1.0.3';
         this.uuid = false;
         this.domain = window.location.hostname;
         this.privacy = 'none'; //Privacy setup. none|default|strict
@@ -23,6 +23,8 @@ class Confection {
         this.appendCss = '';
         this.randomId = 'banner' + this.hexSingleConvert( this.random_number(10000, 99999) );
         this.badgeStyle = document.createElement("style");
+        this.badgeToggler = document.createElement("DIV");
+        this.customLogo = false;
 
         /*
          * Translation Strings
@@ -342,7 +344,22 @@ class Confection {
 
 
     logoSvg( color ) {
+        if (this.customLogo !== false)
+            return this.customLogo;
+
         return '<svg style="position: absolute;width: 30px;height: 30px;top: 10px;left: 50%;transform: translateX(-50%); xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path fill="'+ color +'" d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.9 2 2 2zm4.6 9.99l-1.07-1.07-1.08 1.07c-1.3 1.3-3.58 1.31-4.89 0l-1.07-1.07-1.09 1.07C6.75 16.64 5.88 17 4.96 17c-.73 0-1.4-.23-1.96-.61V21c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-4.61c-.56.38-1.23.61-1.96.61-.92 0-1.79-.36-2.44-1.01zM18 9h-5V7h-2v2H6c-1.66 0-3 1.34-3 3v1.54c0 1.08.88 1.96 1.96 1.96.52 0 1.02-.2 1.38-.57l2.14-2.13 2.13 2.13c.74.74 2.03.74 2.77 0l2.14-2.13 2.13 2.13c.37.37.86.57 1.38.57 1.08 0 1.96-.88 1.96-1.96V12C21 10.34 19.66 9 18 9z"/></svg>';
+        
+    }
+
+
+    /*
+     * Set Custom Logo
+     */
+    setCustomLogo( logoString ) {
+
+        this.customLogo = '<img style="width: 50px;height: 50px;" src="'+ logoString +'"></img>';
+        confection.badgeToggler.innerHTML = this.customLogo;
+
     }
 
 
@@ -389,9 +406,8 @@ class Confection {
         badge.id = this.randomId;
         badge.classList.add(this.bannerPosition);
 
-        var badgeToggler = document.createElement("DIV");
-        badgeToggler.classList.add('toggler', confection.privacy);
-        badgeToggler.innerHTML = this.logoSvg('#fff');
+        this.badgeToggler.classList.add('toggler', confection.privacy);
+        this.badgeToggler.innerHTML = this.logoSvg('#fff');
         
         var privacyLink = document.createElement("a");
         privacyLink.classList.add('privacy-link');
@@ -401,7 +417,7 @@ class Confection {
 
         privacyLink.style.color = '#fff';
 
-        badge.appendChild(badgeToggler);
+        badge.appendChild(this.badgeToggler);
         badge.onclick = function(){
             confection.showPrivacyBanner.openBanner();
         }
@@ -448,7 +464,7 @@ class Confection {
                 banner.innerHTML += '<span>'+ confection.i18n.banner_strict_base +'</span><br />';
             
             if (confection.bannerPosition == 'left')
-                badge.insertBefore(banner, badgeToggler);
+                badge.insertBefore(banner, this.badgeToggler);
             else
                 badge.appendChild(banner);
             
@@ -502,7 +518,7 @@ class Confection {
 
             if (confection.privacy == 'strict') {
                 
-                badgeToggler.style.background = '#ffc107';
+                confection.badgeToggler.style.background = '#ffc107';
                 
                 //Open following banner immediately
                 if (openPsiBanner === true) {
@@ -513,7 +529,7 @@ class Confection {
                     }
                 }
             } else {
-                badgeToggler.style.background = '#6a8e73';
+                confection.badgeToggler.style.background = '#6a8e73';
                 badge.onclick = function(){
                     openDenyBanner();
                 }
@@ -540,7 +556,7 @@ class Confection {
             banner.innerHTML = '<span>'+ confection.i18n.banner_strict +'</span><br />';
 
             if (confection.bannerPosition == 'left')
-                badge.insertBefore(banner, badgeToggler);
+                badge.insertBefore(banner, confection.badgeToggler);
             else
                 badge.appendChild(banner);
             
@@ -587,7 +603,7 @@ class Confection {
                 badge.removeChild(banner);
             }
 
-            badgeToggler.style.background = '#6a8e73';
+            confection.badgeToggler.style.background = '#6a8e73';
 
             //All set. All consent needed got.
             badge.onclick = function(){
@@ -610,7 +626,7 @@ class Confection {
             banner.innerHTML = '<span>'+ confection.i18n.banner_collecting +'</span>';
 
             if (confection.bannerPosition == 'left')
-                badge.insertBefore(banner, badgeToggler);
+                badge.insertBefore(banner, confection.badgeToggler);
             else
                 badge.appendChild(banner);
             
@@ -645,7 +661,7 @@ class Confection {
                 confection.consentLost = confection.consent;
                 confection.setConsent(0);
 
-                badgeToggler.style.background = '#000';
+                confection.badgeToggler.style.background = '#000';
                 
                 badge.onclick = function(){
                     confection.showPrivacyBanner.regainConsent();
@@ -673,7 +689,7 @@ class Confection {
             banner.innerHTML = '<span>'+ confection.i18n.banner_none + '<a href="https://confection.io/people?utm_source=Confection-Banner&utm_medium=' + confection.domain +'" target="_blank">'+ confection.i18n.button_click +'</a></span><br />';
             
             if (confection.bannerPosition == 'left')
-                badge.insertBefore(banner, badgeToggler);
+                badge.insertBefore(banner, confection.badgeToggler);
             else
                 badge.appendChild(banner);
             
@@ -970,7 +986,6 @@ class Confection {
         }
        
     }
-
 
 
     /*
